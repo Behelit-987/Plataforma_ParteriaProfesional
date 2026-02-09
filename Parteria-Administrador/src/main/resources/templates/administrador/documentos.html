@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Documentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2c3e50;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            border-bottom: 1px solid #34495e;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #34495e;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .document-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .document-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 p-0 sidebar">
+                <div class="p-3">
+                    <h4 class="text-white">Panel Administrador</h4>
+                    <p class="text-white-50 mb-0" th:text="${nombreUsuario}">Usuario</p>
+                </div>
+                <nav>
+                    <a href="/administrador/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="/administrador/parteros"><i class="fas fa-users"></i> Gestión Parteros</a>
+                    <a href="/administrador/documentos" class="active"><i class="fas fa-file-alt"></i> Revisión Documentos</a>
+                    <a href="/administrador/documentos/todos"><i class="fas fa-list"></i> Todos los Documentos</a>
+                    <a href="/administrador/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
+                    <a href="/logout" class="mt-5"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                </nav>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1><i class="fas fa-file-alt"></i> Gestión de Documentos</h1>
+                        <a href="/administrador/dashboard" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="text-muted">Pendientes</h5>
+                                        <h2 class="text-warning" th:text="${documentosPendientes}">0</h2>
+                                    </div>
+                                    <i class="fas fa-clock fa-3x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="text-muted">Aprobados</h5>
+                                        <h2 class="text-success" th:text="${documentosAprobados}">0</h2>
+                                    </div>
+                                    <i class="fas fa-check-circle fa-3x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="text-muted">Rechazados</h5>
+                                        <h2 class="text-danger" th:text="${documentosRechazados}">0</h2>
+                                    </div>
+                                    <i class="fas fa-times-circle fa-3x text-danger"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="text-muted">Total</h5>
+                                        <h2 class="text-primary" th:text="${documentosPendientes + documentosAprobados + documentosRechazados}">0</h2>
+                                    </div>
+                                    <i class="fas fa-folder fa-3x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Documentos por Revisar -->
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0"><i class="fas fa-clipboard-check"></i> Documentos por Revisar</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Mensaje si no hay documentos -->
+                            <div th:if="${#lists.isEmpty(documentos)}" class="text-center py-5">
+                                <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                                <h4>¡No hay documentos pendientes!</h4>
+                                <p class="text-muted">Todos los documentos han sido revisados.</p>
+                            </div>
+                            
+                            <!-- Lista de documentos -->
+                            <div th:if="${not #lists.isEmpty(documentos)}">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>ID Partero</th>
+                                                <th>Estado</th>
+                                                <th>Documentos Subidos</th>
+                                                <th>Fecha</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="documento : ${documentos}">
+                                                <td th:text="${documento.idPProfesional}">1</td>
+                                                <td th:text="${documento.idPartero}">1001</td>
+                                                <td>
+                                                    <span th:if="${documento.estadoGeneral == T(mx.edu.uacm.ws.Entity.DocumentosProfesionales$EstadoGeneral).pendiente}" 
+                                                          class="badge bg-warning">Pendiente</span>
+                                                    <span th:if="${documento.estadoGeneral == T(mx.edu.uacm.ws.Entity.DocumentosProfesionales$EstadoGeneral).en_revision}" 
+                                                          class="badge bg-info">En Revisión</span>
+                                                    <span th:if="${documento.estadoGeneral == T(mx.edu.uacm.ws.Entity.DocumentosProfesionales$EstadoGeneral).aprobado}" 
+                                                          class="badge bg-success">Aprobado</span>
+                                                    <span th:if="${documento.estadoGeneral == T(mx.edu.uacm.ws.Entity.DocumentosProfesionales$EstadoGeneral).rechazado}" 
+                                                          class="badge bg-danger">Rechazado</span>
+                                                    <span th:if="${documento.estadoGeneral == T(mx.edu.uacm.ws.Entity.DocumentosProfesionales$EstadoGeneral).incompleto}" 
+                                                          class="badge bg-secondary">Incompleto</span>
+                                                </td>
+                                                <td>
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.tituloProfesional != null} ? 'text-success' : 'text-muted'"></i> 
+                                                        Título 
+                                                        <span th:text="${documento.tituloProfesional != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.cedulaProfesional != null} ? 'text-success' : 'text-muted'"></i> 
+                                                        Cédula 
+                                                        <span th:text="${documento.cedulaProfesional != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.ine != null} ? 'text-success' : 'text-muted'"></i> 
+                                                        INE 
+                                                        <span th:text="${documento.ine != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.comprobanteDomicilio != null} ? 'text-success' : 'text-muted'"></i> 
+                                                         Comprobante de Domicilio
+                                                        <span th:text="${documento.comprobanteDomicilio != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.fotografia != null} ? 'text-success' : 'text-muted'"></i> 
+                                                         Fotografia
+                                                        <span th:text="${documento.fotografia != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.cv != null} ? 'text-success' : 'text-muted'"></i> 
+                                                         Curriculum Vitae
+                                                        <span th:text="${documento.cv != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.reanimacionNeonatal != null} ? 'text-success' : 'text-muted'"></i> 
+                                                         Certificado en Reanimacion Neonatal
+                                                        <span th:text="${documento.reanimacionNeonatal != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.reanimacionAdultos != null} ? 'text-success' : 'text-muted'"></i> 
+                                                         Certificado en Reanimacion de Adultos
+                                                        <span th:text="${documento.reanimacionAdultos != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                    
+                                                    <small class="d-block">
+                                                        <i class="fas fa-file" th:classappend="${documento.urgenciasObstetricas != null} ? 'text-success' : 'text-muted'"></i> 
+                                                         Certificado en Urgencias Obstetricas
+                                                        <span th:text="${documento.urgenciasObstetricas != null} ? '✓' : '✗'"></span>
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <!-- Aquí podrías agregar una fecha si tu entidad la tiene -->
+                                                    Sin fecha
+                                                </td>
+                                                <td>
+                                                    <a th:href="@{/administrador/documentos/{id}(id=${documento.idPProfesional})}" 
+                                                       class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i> Revisar
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instrucciones -->
+                    <div class="alert alert-info mt-4">
+                        <h5><i class="fas fa-info-circle"></i> Instrucciones</h5>
+                        <ul class="mb-0">
+                            <li>Revisa cada documento haciendo clic en "Revisar"</li>
+                            <li>Cambia el estado individual de cada documento según corresponda</li>
+                            <li>Establece el estado general del expediente al final</li>
+                            <li>Guarda los cambios para actualizar el estado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
