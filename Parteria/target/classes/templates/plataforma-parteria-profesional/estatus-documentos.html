@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatus Documentos - Plataforma Partería Profesional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            padding-left: 30px;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .progress {
+            height: 25px;
+            border-radius: 12px;
+        }
+        
+        .document-status {
+            font-size: 0.9em;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .status-pendiente { 
+            background-color: #fff3cd; 
+            color: #856404; 
+            border: 1px solid #ffeaa7; 
+        }
+        
+        .status-aprobado { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        
+        .status-rechazado { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        
+        .status-incompleto { 
+            background-color: #e2e3e5; 
+            color: #383d41; 
+            border: 1px solid #d6d8db; 
+        }
+        
+        .document-item {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            color: #495057;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                text-align: center;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .sidebar .user-info {
+                padding: 10px;
+            }
+            
+            .sidebar .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .sidebar .user-info .user-name {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="user-name">
+                <h6 sec:authorize="isAuthenticated()">
+                    <span th:if="${nombreUsuario}" th:text="${nombreUsuario}"></span>
+                    <span th:unless="${nombreUsuario}" sec:authentication="name"></span>
+                </h6>
+                <small>Partero Profesional</small>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="nav flex-column">
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional}">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/subir-documentos}">
+                <i class="fas fa-file-upload"></i>
+                <span>Subir Documentos</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/modificar-documentos}">
+                <i class="fas fa-edit"></i>
+                <span>Modificar Documentos</span>
+            </a>
+            
+            <a class="nav-link active" th:href="@{/plataforma-parteria-profesional/estatus-documentos}">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Estatus de Documentos</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded">
+            <div class="container-fluid">
+                <span class="navbar-brand">
+                    <i class="fas fa-clipboard-check me-2"></i>Estatus de Documentos
+                </span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/modificar-documentos}">
+                                <i class="fas fa-edit me-1"></i>
+                                Modificar Documentos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+		
+		<!-- Después de las alertas existentes -->
+		<div th:if="${documentos.estado_general == 'pendiente'}" 
+		     class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+		    <i class="fas fa-info-circle me-2"></i>
+		    <strong>¡Todos los documentos han sido subidos!</strong> Tu solicitud está en estado 
+		    <span class="status-pendiente document-status">PENDIENTE</span> de revisión. 
+		    Serás notificado cuando se complete la validación de tus documentos.
+		</div>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <h1 class="display-5 mb-3">
+                    <i class="fas fa-clipboard-check me-3"></i>
+                    Estatus de Documentos
+                </h1>
+                <p class="lead mb-4">Revisa el progreso y estado de tu documentación profesional</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- Resumen General -->
+            <div class="card status-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Resumen General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6>Progreso de Documentación</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" 
+                                     th:style="'width: ' + ${progreso} + '%'"
+                                     th:text="${progreso} + '%'">
+                                </div>
+                            </div>
+                            <p class="text-muted">
+                                <span th:text="${documentosSubidos}">0</span> de 
+                                <span th:text="${totalDocumentos}">0</span> documentos subidos
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div th:classappend="${(documentos.estado_general == 'aprobado') ? 'status-aprobado' : 
+                                                 (documentos.estado_general == 'rechazado') ? 'status-rechazado' : 
+                                                 (documentos.estado_general == 'en_revision') ? 'status-pendiente' : 'status-incompleto'}"
+                                 class="document-status d-inline-block">
+                                <strong th:text="${documentos.estado_general ?: 'Incompleto'}">
+                                    Estado General
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentos Individuales -->
+            <div class="card status-card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Estatus por Documento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Documentos Principales -->
+                        <div class="col-md-6">
+                            <h6 class="section-title">Documentos Principales</h6>
+                            
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Título Profesional</strong></span>
+                                    <span th:classappend="${(documentos.estado_titulo == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_titulo == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_titulo ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.titulo_profesional}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.titulo_profesional}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Cédula Profesional</strong></span>
+                                    <span th:classappend="${(documentos.estado_cedula == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_cedula == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_cedula ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.cedula_profesional}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.cedula_profesional}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>INE/Identificación</strong></span>
+                                    <span th:classappend="${(documentos.estado_ine == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_ine == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_ine ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.ine}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.ine}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Comprobante Domicilio</strong></span>
+                                    <span th:classappend="${(documentos.estado_comprobante == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_comprobante == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_comprobante ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.comprobante_domicilio}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.comprobante_domicilio}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Certificaciones y Otros -->
+                        <div class="col-md-6">
+                            <h6 class="section-title">Certificaciones y Otros</h6>
+                            
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Fotografía</strong></span>
+                                    <span th:classappend="${(documentos.estado_fotografia == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_fotografia == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_fotografia ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.fotografia}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.fotografia}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Curriculum Vitae</strong></span>
+                                    <span th:classappend="${(documentos.estado_cv == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_cv == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_cv ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.cv}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.cv}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Reanimación Neonatal</strong></span>
+                                    <span th:classappend="${(documentos.estado_reanimacion_neonatal == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_reanimacion_neonatal == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_reanimacion_neonatal ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.reanimacion_neonatal}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.reanimacion_neonatal}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Reanimación Adultos</strong></span>
+                                    <span th:classappend="${(documentos.estado_reanimacion_adultos == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_reanimacion_adultos == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_reanimacion_adultos ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.reanimacion_adultos}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.reanimacion_adultos}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+
+                            <div class="document-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Urgencias Obstétricas</strong></span>
+                                    <span th:classappend="${(documentos.estado_urgencias == 'aprobado') ? 'status-aprobado' : 
+                                                         (documentos.estado_urgencias == 'rechazado') ? 'status-rechazado' : 'status-pendiente'}"
+                                          class="document-status">
+                                        <span th:text="${documentos.estado_urgencias ?: 'Pendiente'}"></span>
+                                    </span>
+                                </div>
+                                <small class="text-muted" th:if="${documentos.urgencias_obstetricas}">
+                                    <i class="fas fa-check text-success me-1"></i>Documento subido
+                                </small>
+                                <small class="text-muted" th:unless="${documentos.urgencias_obstetricas}">
+                                    <i class="fas fa-times text-danger me-1"></i>Documento pendiente
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Estados -->
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-info-circle me-2"></i>Leyenda de Estados</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <span class="status-aprobado document-status">Aprobado</span>
+                        <small class="d-block text-muted">Documento validado y aceptado</small>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="status-pendiente document-status">Pendiente</span>
+                        <small class="d-block text-muted">En proceso de revisión</small>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="status-rechazado document-status">Rechazado</span>
+                        <small class="d-block text-muted">Requiere modificación</small>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="status-incompleto document-status">Incompleto</span>
+                        <small class="d-block text-muted">Documento no subido</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-white py-4 mt-5 rounded">
+            <div class="container text-center">
+                <p class="mb-0">
+                    <i class="fas fa-copyright me-2"></i>
+                    2025 Plataforma de Partería. 
+                    <br class="d-md-none">
+                    Todos los derechos reservados para Gabriel Jehosafat Reyes Alcantara.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Script para manejar el estado activo del menú
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentLocation = window.location.pathname;
+            const menuItems = document.querySelectorAll('.sidebar .nav-link');
+            
+            menuItems.forEach(item => {
+                const itemHref = item.getAttribute('href');
+                if (currentLocation.includes(itemHref) && itemHref !== '#') {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

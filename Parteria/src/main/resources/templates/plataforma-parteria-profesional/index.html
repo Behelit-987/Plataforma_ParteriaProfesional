@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Partería Profesional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            padding-left: 30px;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+        }
+        
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .btn-custom {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+        }
+        
+        .btn-custom:hover {
+            background-color: #45a049;
+        }
+        
+        .feature-card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                text-align: center;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .sidebar .user-info {
+                padding: 10px;
+            }
+            
+            .sidebar .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .sidebar .user-info .user-name {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="user-name">
+                <h6 sec:authorize="isAuthenticated()">
+                    <span th:if="${partero}" th:text="${partero.nombres + ' ' + partero.apellidos}"></span>
+                    <span th:unless="${partero}" sec:authentication="name"></span>
+                </h6>
+                <small>Partero Profesional</small>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="nav flex-column">
+            <a class="nav-link active" th:href="@{/plataforma-parteria-profesional}">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/subir-documentos}">
+                <i class="fas fa-file-upload"></i>
+                <span>Subir Documentos</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/modificar-documentos}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Modificar Documentos</span>
+            </a>
+            
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/estatus-documentos}">
+                <i class="fas fa-users"></i>
+                <span>Estatus de Documentos</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-bell"></i>
+                                <span class="badge bg-danger"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-question-circle"></i>
+                                Ayuda
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mensajes -->
+        <div th:if="${param.logout}" class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            Sesión cerrada exitosamente.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-heartbeat me-3"></i>
+                    Plataforma de Partería Profesional
+                </h1>
+                <p class="lead mb-4">Sistema especializado para profesionales de la partería</p>
+                
+                <div class="user-actions">
+                    <div sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/registro}" class="btn btn-light btn-lg me-2">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Comenzar Ahora
+                        </a>
+                        <a th:href="@{/login-parteria}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Iniciar Sesión
+                        </a>
+                    </div>
+                    <!-- 
+                    <div sec:authorize="isAuthenticated()">
+                        <p class="h5">¡Bienvenido de vuelta!</p>
+                        <p>Explora las funcionalidades de la plataforma.</p>
+                        <a th:href="@{/plataforma-parteria-profesional/subir-documentos}" 
+                           class="btn btn-light btn-lg mt-3">
+                            <i class="fas fa-file-upload me-2"></i>
+                            Subir Documentos Profesionales
+                        </a>
+                    </div>
+                     -->
+                </div>
+            </div>
+        </section>
+
+        </div>
+
+        <!-- Features Section -->
+        <section class="py-4">
+            <div class="container">
+                <h2 class="text-center mb-5">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Especialidades Profesionales
+                </h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-baby fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Enfermería Perinatal</h5>
+                                <p class="text-muted">Atención especializada en el período perinatal</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-nurse fa-3x text-success mb-3"></i>
+                                <h5 class="card-title">Licenciatura en Enfermería y Obstetricia</h5>
+                                <p class="text-muted">Formación integral en enfermería y obstetricia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-white py-4 mt-5 rounded">
+            <div class="container text-center">
+                <p class="mb-0">
+                    <i class="fas fa-copyright me-2"></i>
+                    2025 Plataforma de Partería. 
+                    <br class="d-md-none">
+                    Todos los derechos reservados para Gabriel Jehosafat Reyes Alcantara.
+                </p>
+            </div>
+        </footer>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Script para manejar el estado activo del menú
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentLocation = window.location.pathname;
+            const menuItems = document.querySelectorAll('.sidebar .nav-link');
+            
+            menuItems.forEach(item => {
+                const itemHref = item.getAttribute('href');
+                if (currentLocation.includes(itemHref) && itemHref !== '#') {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+                
+                // Remover active al hacer clic
+                item.addEventListener('click', function() {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

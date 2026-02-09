@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Documentos - Plataforma Partería Profesional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            padding-left: 30px;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+        }
+        
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .btn-custom {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+        }
+        
+        .btn-custom:hover {
+            background-color: #45a049;
+        }
+        
+        .document-card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .document-status {
+            font-size: 0.8em;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 500;
+        }
+        
+        .status-uploaded {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .file-info {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .section-title {
+            color: #495057;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                text-align: center;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .sidebar .user-info {
+                padding: 10px;
+            }
+            
+            .sidebar .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .sidebar .user-info .user-name {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="user-name">
+                <h6 sec:authorize="isAuthenticated()">
+                    <span th:if="${nombreUsuario}" th:text="${nombreUsuario}"></span>
+                    <span th:unless="${nombreUsuario}" sec:authentication="name"></span>
+                </h6>
+                <small>Partero Profesional</small>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="nav flex-column">
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional}">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/subir-documentos}">
+                <i class="fas fa-file-upload"></i>
+                <span>Subir Documentos</span>
+            </a>
+            
+            <a class="nav-link active" th:href="@{/plataforma-parteria-profesional/modificar-documentos}">
+                <i class="fas fa-edit"></i>
+                <span>Modificar Documentos</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/estatus-documentos}">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Estatus de Documentos</span>
+            </a>
+            
+            <a class="nav-link" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded">
+            <div class="container-fluid">
+                <span class="navbar-brand">
+                    <i class="fas fa-edit me-2"></i>Modificar Documentos
+                </span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/plataforma-parteria-profesional/estatus-documentos}">
+                                <i class="fas fa-clipboard-check me-1"></i>
+                                Ver Estatus
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-question-circle"></i>
+                                Ayuda
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Alertas -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <h1 class="display-5 mb-3">
+                    <i class="fas fa-edit me-3"></i>
+                    Modificar Documentos
+                </h1>
+                <p class="lead mb-4">Actualiza o reemplaza tus documentos profesionales</p>
+            </div>
+        </section>
+
+        <!-- Formulario de Modificación -->
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card document-card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-sync-alt me-2"></i>Actualizar Documentos Existentes
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/plataforma-parteria-profesional/subir-documentos}" 
+                                  method="post" enctype="multipart/form-data">
+                                  
+                                <!-- Documentos Principales -->
+                                <h5 class="section-title">
+                                    <i class="fas fa-file-contract me-2"></i>Documentos Principales
+                                </h5>
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Título Profesional</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.titulo_profesional}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.titulo_profesional}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="titulo_profesional" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Cédula Profesional</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.cedula_profesional}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.cedula_profesional}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="cedula_profesional" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">INE/Identificación</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.ine}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.ine}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="ine" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Comprobante de Domicilio</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.comprobante_domicilio}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.comprobante_domicilio}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="comprobante_domicilio" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Certificaciones y Otros -->
+                                <h5 class="section-title">
+                                    <i class="fas fa-certificate me-2"></i>Certificaciones y Otros Documentos
+                                </h5>
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Fotografía</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.fotografia}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.fotografia}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="fotografia" 
+                                               accept=".jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: JPG, JPEG, PNG (Solo imágenes)</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Curriculum Vitae</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.cv}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.cv}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="cv" 
+                                               accept=".pdf,.doc,.docx">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, DOC, DOCX</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">Reanimación Neonatal</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.reanimacion_neonatal}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.reanimacion_neonatal}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="reanimacion_neonatal" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">Reanimación Adultos</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.reanimacion_adultos}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.reanimacion_adultos}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="reanimacion_adultos" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">Urgencias Obstétricas</label>
+                                        <div class="mb-2">
+                                            <span th:if="${documentos.urgencias_obstetricas}" 
+                                                  class="status-uploaded document-status">
+                                                <i class="fas fa-check me-1"></i>Documento Subido
+                                            </span>
+                                            <span th:unless="${documentos.urgencias_obstetricas}" 
+                                                  class="status-pending document-status">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                        </div>
+                                        <input type="file" class="form-control" name="urgencias_obstetricas" 
+                                               accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-info mt-1">
+                                            <small>Formatos: PDF, JPG, JPEG, PNG</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botones de Acción -->
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between">
+                                            <a th:href="@{/plataforma-parteria-profesional}" 
+                                               class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                                            </a>
+                                            <button type="submit" class="btn btn-custom">
+                                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Información Importante -->
+                    <div class="alert alert-info mt-4">
+                        <h6><i class="fas fa-info-circle me-2"></i>Información importante</h6>
+                        <ul class="mb-0">
+                            <li>Solo se actualizarán los documentos que selecciones nuevamente</li>
+                            <li>Los documentos existentes serán reemplazados por los nuevos archivos</li>
+                            <li>Formatos aceptados: PDF, JPG, JPEG, PNG para imágenes, PDF y DOC para documentos</li>
+                            <li>El tamaño máximo por archivo es de 10MB</li>
+                            <li>Los documentos marcados con <span class="status-uploaded document-status">Documento Subido</span> ya han sido cargados anteriormente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-white py-4 mt-5 rounded">
+            <div class="container text-center">
+                <p class="mb-0">
+                    <i class="fas fa-copyright me-2"></i>
+                    2025 Plataforma de Partería. 
+                    <br class="d-md-none">
+                    Todos los derechos reservados para Gabriel Jehosafat Reyes Alcantara.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Script para manejar el estado activo del menú
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentLocation = window.location.pathname;
+            const menuItems = document.querySelectorAll('.sidebar .nav-link');
+            
+            menuItems.forEach(item => {
+                const itemHref = item.getAttribute('href');
+                if (currentLocation.includes(itemHref) && itemHref !== '#') {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+
+        // Mostrar nombre de archivo seleccionado
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileName = this.files[0]?.name;
+                if (fileName) {
+                    const statusElement = this.previousElementSibling?.previousElementSibling;
+                    if (statusElement) {
+                        const originalStatus = statusElement.innerHTML;
+                        statusElement.innerHTML = `<i class="fas fa-sync-alt me-1"></i>Actualizando: ${fileName}`;
+                        statusElement.className = 'status-uploaded document-status';
+                        
+                        // Reset si se cancela la selección
+                        this.addEventListener('click', function() {
+                            setTimeout(() => {
+                                if (!this.files[0]) {
+                                    statusElement.innerHTML = originalStatus;
+                                    statusElement.className = originalStatus.includes('Subido') ? 
+                                        'status-uploaded document-status' : 'status-pending document-status';
+                                }
+                            }, 100);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

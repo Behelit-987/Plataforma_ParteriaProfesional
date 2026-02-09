@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Documentos - Partería Profesional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        .document-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+        .file-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .btn-custom {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            font-weight: bold;
+        }
+        .btn-custom:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/plataforma-parteria-profesional}">Plataforma de Partería Profesional</a>
+            <div class="navbar-nav ms-auto">
+                <div sec:authorize="isAuthenticated()">
+                    <span class="navbar-text me-3">
+                        Bienvenido, <span sec:authentication="name"></span>
+                    </span>
+                   <!--  <a class="nav-link" th:href="@{/plataforma-parteria-profesional}">Inicio</a>  -->
+                    <a class="nav-link" th:href="@{/logout}">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mensajes de éxito/error -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show m-3" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="display-5 mb-3">Subir Documentos Profesionales</h1>
+            <p class="lead">Completa tu perfil profesional subiendo los documentos requeridos</p>
+        </div>
+    </section>
+
+    <!-- Formulario de Documentos -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <form th:action="@{/plataforma-parteria-profesional/subir-documentos}" 
+                          method="post" 
+                          enctype="multipart/form-data"
+                          th:object="${documentosForm}">
+
+                        <!-- Sección 1: Documentos Personales y Profesionales -->
+                        <div class="document-section">
+                            <h4 class="mb-4">📄 Documentos Personales y Profesionales</h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Título Profesional</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{titulo_profesional}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Formatos aceptados: PDF, JPG, PNG (Máx. 10MB)</div>
+                                    <div th:if="${documentos?.titulo_profesional}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.titulo_profesional}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Cédula Profesional</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{cedula_profesional}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Formatos aceptados: PDF, JPG, PNG (Máx. 10MB)</div>
+                                    <div th:if="${documentos?.cedula_profesional}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.cedula_profesional}"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">INE</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{ine}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Formatos aceptados: PDF, JPG, PNG (Máx. 10MB)</div>
+                                    <div th:if="${documentos?.ine}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.ine}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Comprobante de Domicilio</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{comprobante_domicilio}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Formatos aceptados: PDF, JPG, PNG (Máx. 10MB)</div>
+                                    <div th:if="${documentos?.comprobante_domicilio}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.comprobante_domicilio}"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Fotografía</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{fotografia}"
+                                           accept=".jpg,.jpeg,.png">
+                                    <div class="file-info">Formatos aceptados: JPG, PNG (Máx. 5MB)</div>
+                                    <div th:if="${documentos?.fotografia}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.fotografia}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Curriculum Vitae</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{cv}"
+                                           accept=".pdf,.doc,.docx">
+                                    <div class="file-info">Formatos aceptados: PDF, DOC, DOCX (Máx. 10MB)</div>
+                                    <div th:if="${documentos?.cv}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.cv}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Certificaciones -->
+                        <div class="document-section">
+                            <h4 class="mb-4">🎓 Certificaciones y Cursos</h4>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label required-field">Reanimación Neonatal</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{reanimacion_neonatal}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Certificación vigente</div>
+                                    <div th:if="${documentos?.reanimacion_neonatal}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.reanimacion_neonatal}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label required-field">Reanimación de Adultos</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{reanimacion_adultos}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Certificación vigente</div>
+                                    <div th:if="${documentos?.reanimacion_adultos}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.reanimacion_adultos}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label required-field">Urgencias Obstétricas</label>
+                                    <input type="file" class="form-control" 
+                                           th:field="*{urgencias_obstetricas}"
+                                           accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="file-info">Certificación o curso</div>
+                                    <div th:if="${documentos?.urgencias_obstetricas}" class="text-success mt-1">
+                                        ✅ Archivo subido: <span th:text="${documentos.urgencias_obstetricas}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 3: Áreas de Experiencia -->
+                        <div class="document-section">
+                            <h4 class="mb-4">💼 Áreas de Experiencia Profesional</h4>
+                            <p class="text-muted mb-4">Selecciona las áreas en las que tienes experiencia:</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Áreas de Consulta Prenatal</label>
+                                    <select class="form-select" th:field="*{areas_consulta_prenatal}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Triage Obstétrico</label>
+                                    <select class="form-select" th:field="*{triage_obstetrica}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Sala de Labor</label>
+                                    <select class="form-select" th:field="*{sala_labor}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Recuperación</label>
+                                    <select class="form-select" th:field="*{recuperacion}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Atención de Parto</label>
+                                    <select class="form-select" th:field="*{atencion_parto}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Hospitalización</label>
+                                    <select class="form-select" th:field="*{hospitalizacion}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Planificación Familiar</label>
+                                    <select class="form-select" th:field="*{planificacion_familiar}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Educación Perinatal</label>
+                                    <select class="form-select" th:field="*{educacion_perinatal}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Estimulación Temprana</label>
+                                    <select class="form-select" th:field="*{estimulacion_temprana}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 4: Asociaciones -->
+                        <div class="document-section">
+                            <h4 class="mb-4">🤝 Asociaciones Profesionales</h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">¿Pertenece a alguna asociación?</label>
+                                    <select class="form-select" th:field="*{asociacion_perteneciente}">
+                                        <option value="">Seleccionar</option>
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row" th:if="*{asociacion_perteneciente} == 'si'">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre de la Asociación</label>
+                                    <input type="text" class="form-control" 
+                                           th:field="*{asociacion}"
+                                           placeholder="Ej: Asociación Mexicana de Partería">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Cargo que Desempeña</label>
+                                    <input type="text" class="form-control" 
+                                           th:field="*{cargo}"
+                                           placeholder="Ej: Secretario, Vocal, etc.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-custom btn-lg me-3">
+                                    💾 Guardar Documentos
+                                </button>
+                                <a th:href="@{/plataforma-parteria-profesional}" class="btn btn-outline-secondary btn-lg">
+                                    ← Volver al Inicio
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2025 Plataforma de Partería Profesional. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script para mostrar/ocultar campos de asociación -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const asociacionSelect = document.querySelector('[th\\:field="*{asociacion_perteneciente}"]');
+            const asociacionFields = document.querySelectorAll('[th\\:if]');
+            
+            function toggleAsociacionFields() {
+                const asociacionRow = document.querySelector('.row[th\\:if]');
+                if (asociacionSelect.value === 'si') {
+                    asociacionRow.style.display = 'flex';
+                } else {
+                    asociacionRow.style.display = 'none';
+                }
+            }
+            
+            if (asociacionSelect) {
+                asociacionSelect.addEventListener('change', toggleAsociacionFields);
+                toggleAsociacionFields(); // Ejecutar al cargar la página
+            }
+        });
+    </script>
+</body>
+</html>

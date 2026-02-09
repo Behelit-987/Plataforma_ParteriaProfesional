@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Plataforma de Partería</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .registration-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .btn-custom {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .conditional-field {
+            display: none;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="registration-container">
+            <h2 class="text-center mb-4">Registro de Partero</h2>
+            
+            <!-- Mensajes de error -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form th:action="@{/registrar}" th:object="${partero}" method="post">
+                <!-- Información Personal -->
+                <h5 class="mb-3">Información Personal</h5>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="nombres" class="form-label">Nombres *</label>
+                        <input type="text" class="form-control" id="nombres" name="nombres" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apellidos" class="form-label">Apellidos *</label>
+                        <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
+                        <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="sexo" class="form-label">Sexo *</label>
+                        <select class="form-select" id="sexo" name="sexo" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="hombre">Hombre</option>
+                            <option value="mujer">Mujer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Nacionalidad - Campo condicional -->
+                <div class="mb-3">
+                    <label for="nacionalidad" class="form-label">¿Es mexicano? *</label>
+                    <select class="form-select" id="nacionalidad" name="nacionalidad" required onchange="toggleNacionalidadFields()">
+                        <option value="">Seleccionar...</option>
+                        <option value="si">Sí</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                
+                <div id="mexicanosFields" class= "conditional-field">
+                	<h6 class="mb-3">Información para Mexicanos</h6>
+                	<div class="row mb-3">
+                		<div class="col-md-6">
+                			<label for="curp" class="form-label">CURP:</label>
+                			<input type="text" class = "form-control" id="curp" name = "curp">
+                		</div>
+                	</div>
+                
+                </div>
+
+                <!-- Campos para extranjeros (se muestran solo si selecciona "No") -->
+                <div id="extranjeroFields" class="conditional-field">
+                    <h6 class="mb-3">Información para extranjeros</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="pais_origen" class="form-label">País de Origen *</label>
+                            <input type="text" class="form-control" id="pais_origen" name="pais_origen">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="doc_pais" class="form-label">Documento del País *</label>
+                            <input type="text" class="form-control" id="doc_pais" name="doc_pais">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="pais_nut" class="form-label">NUT (Número Único de Trámite) *</label>
+                            <input type="number" class="form-control" id="pais_nut" name="pais_nut">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fech_vencimiento" class="form-label">Fecha de Vencimiento del Documento *</label>
+                            <input type="date" class="form-control" id="fech_vencimiento" name="fech_vencimiento">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Contacto -->
+                <h5 class="mb-3 mt-4">Información de Contacto</h5>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="telefono" class="form-label">Teléfono *</label>
+                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                    </div>
+                    
+                </div>
+
+                <!-- Información Profesional -->
+                <h5 class="mb-3 mt-4">Información Profesional</h5>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="perfil_profesional" class="form-label">Perfil Profesional *</label>
+                        <select class="form-select" id="perfil_profesional" name="perfil_profesional" required onchange="toggleProfesionField()">
+						    <option value="">Seleccionar...</option>
+						    <option value="Enfermeria_Perinatal">Enfermería Perinatal</option>
+						    <option value="Licenciatura_en_Enfermeria_y_Obstetrica">Licenciatura en Enfermería y Obstetricia</option>
+						    <!--  <option value="Licenciatura_en_Parteria">Licenciatura en Partería</option> -->
+						    <option value="Parteria_Tecnica">Partería Técnica</option>
+						    <option value="Autonomo">Autónomo</option>
+						    <option value="Otro">Otro</option>
+						</select>
+                    </div>
+                </div>
+
+                <!-- Campo de profesión (solo se muestra si selecciona "Otro") -->
+                <div id="profesionField" class="conditional-field">
+                    <div class="mb-3">
+                        <label for="profesion" class="form-label">Especifique su profesión *</label>
+                        <input type="text" class="form-control" id="profesion" name="profesion">
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <h5 class="mb-3 mt-4">Seguridad</h5>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo Electrónico *</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="passwordHash" class="form-label">Contraseña *</label>
+                    <input type="password" class="form-control" id="passwordHash" name="passwordHash" required>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-custom">Registrarse</button>
+                    <a th:href="@{/login-parteria}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Función para mostrar/ocultar campos de nacionalidad
+        function toggleNacionalidadFields() {
+            const nacionalidad = document.getElementById('nacionalidad').value;
+            const mexicanosFields = document.getElementById('mexicanosFields');
+            const extranjeroFields = document.getElementById('extranjeroFields');
+            
+            // Ocultar ambos campos primero
+            mexicanosFields.style.display = 'none';
+            extranjeroFields.style.display = 'none';
+            
+            // Remover requeridos de ambos grupos
+            document.getElementById('curp').required = false;
+            
+            document.getElementById('pais_origen').required = false;
+            document.getElementById('doc_pais').required = false;
+            document.getElementById('pais_nut').required = false;
+            document.getElementById('fech_vencimiento').required = false;
+            
+            // Mostrar el campo correspondiente según la selección
+            if (nacionalidad === 'si') {
+                mexicanosFields.style.display = 'block';
+                document.getElementById('curp').required = true;
+            } else if (nacionalidad === 'no') {
+                extranjeroFields.style.display = 'block';
+                document.getElementById('pais_origen').required = true;
+                document.getElementById('doc_pais').required = true;
+                document.getElementById('pais_nut').required = true;
+                document.getElementById('fech_vencimiento').required = true;
+            }
+        }
+
+        // 
+
+        // Función para mostrar/ocultar campo de profesión
+        function toggleProfesionField() {
+            const perfil = document.getElementById('perfil_profesional').value;
+            const profesionField = document.getElementById('profesionField');
+            
+            if (perfil === 'Otro') {
+                profesionField.style.display = 'block';
+                document.getElementById('profesion').required = true;
+            } else {
+                profesionField.style.display = 'none';
+                document.getElementById('profesion').required = false;
+            }
+        }
+
+        // Inicializar el estado de los campos al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleNacionalidadFields();
+            toggleProfesionField();
+        });
+    </script>
+</body>
+</html>
